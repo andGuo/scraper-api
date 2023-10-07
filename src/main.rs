@@ -43,7 +43,7 @@ async fn main() -> Result<(), MyError> {
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
 
     tracing_subscriber::fmt::init();
-    let app = create_router(Arc::new(AppState { db })).layer(cors).layer(TraceLayer::new_for_http());;
+    let app = create_router(Arc::new(AppState { db })).layer(cors).layer(TraceLayer::new_for_http());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::info!("listening on {}", addr);

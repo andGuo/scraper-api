@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Path, Query, State},
+    extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
     Json,
@@ -9,7 +9,7 @@ use axum::{
 use mongodb::bson::oid::ObjectId;
 use serde_json::json;
 
-use crate::{error::MyError, model::Page, AppState};
+use crate::{error::MyError, AppState};
 
 pub async fn handler_root() -> &'static str {
     "Hello, World!"

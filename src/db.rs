@@ -1,6 +1,4 @@
-use crate::error::MyError;
-use crate::response::{GenericResponse, PagesResponse};
-use crate::{error::MyError::*, model::Page};
+use crate::{error::MyError, model::Page, response::PagesResponse};
 use futures::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, Document};
 use mongodb::{options::ClientOptions, Client, Collection};
