@@ -4,6 +4,7 @@ mod handler;
 mod model;
 mod route;
 mod response;
+mod trace;
 
 use std::sync::Arc;
 
@@ -15,7 +16,7 @@ use db::DB;
 use dotenv::dotenv;
 use error::MyError;
 use route::create_router;
-use tower_http::cors::CorsLayer;
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use std::net::SocketAddr;
 
 #[derive(Clone)]
