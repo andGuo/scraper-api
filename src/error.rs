@@ -17,7 +17,7 @@ pub enum MyError {
     MongoDataError(#[from] mongodb::bson::document::ValueAccessError),
     #[error("invalid ID: {0}")]
     InvalidIDError(String),
-    #[error("Note with ID: {0} not found")]
+    #[error("Page with ID: {0} not found")]
     NotFoundError(String),
 }
 
@@ -41,7 +41,7 @@ impl Into<(axum::http::StatusCode, Json<serde_json::Value>)> for MyError {
                 StatusCode::CONFLICT,
                 ErrorResponse {
                     status: "fail",
-                    message: "Note with that title already exists".to_string(),
+                    message: "Page with that title already exists".to_string(),
                 },
             ),
             MyError::InvalidIDError(id) => (
@@ -55,7 +55,7 @@ impl Into<(axum::http::StatusCode, Json<serde_json::Value>)> for MyError {
                 StatusCode::NOT_FOUND,
                 ErrorResponse {
                     status: "fail",
-                    message: format!("Note with ID: {} not found", id),
+                    message: format!("Page with ID: {} not found", id),
                 },
             ),
             MyError::MongoError(e) => (

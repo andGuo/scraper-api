@@ -4,7 +4,6 @@ mod handler;
 mod model;
 mod route;
 mod response;
-mod trace;
 
 use std::sync::Arc;
 

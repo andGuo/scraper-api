@@ -6,12 +6,10 @@ use axum::{
     response::IntoResponse,
     Json,
 };
+use mongodb::bson::oid::ObjectId;
+use serde_json::json;
 
-use crate::{
-    error::MyError,
-    model::Page,
-    AppState,
-};
+use crate::{error::MyError, model::Page, AppState};
 
 pub async fn handler_root() -> &'static str {
     "Hello, World!"
@@ -30,6 +28,18 @@ pub async fn handler_pages(
     }
 }
 
-pub async fn handler_page(Path(id): Path<String>) -> impl IntoResponse {
-    println!("page: {}", id);
+pub async fn handler_page(
+    Path(page_id): Path<String>,
+    State(app_state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    match ObjectId::parse_str(page_id) {
+        Ok(id) => match app_state.db.get_page(id).await.map_err(MyError::from) {
+            Ok(res) => Ok(Json(res)),
+            Err(e) => Err(e.into()),
+        },
+        Err(_) => Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error": "Invalid id"})),
+        )),
+    }
 }

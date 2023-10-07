@@ -2,7 +2,7 @@ use crate::error::MyError;
 use crate::response::{GenericResponse, PagesResponse};
 use crate::{error::MyError::*, model::Page};
 use futures::TryStreamExt;
-use mongodb::bson::Document;
+use mongodb::bson::{doc, oid::ObjectId, Document};
 use mongodb::{options::ClientOptions, Client, Collection};
 
 #[derive(Clone, Debug)]
@@ -53,6 +53,23 @@ impl DB {
         Ok(PagesResponse {
             status: "success",
             data: json_res,
+        })
+    }
+
+    pub async fn get_page(&self, page_id: ObjectId) -> Result<PagesResponse> {
+        let page = match self
+            .page_collection
+            .find_one(doc! {"_id": page_id}, None)
+            .await
+        {
+            Ok(Some(page)) => page,
+            Ok(None) => return Err(MyError::NotFoundError(page_id.to_string())),
+            Err(e) => return Err(MyError::MongoError(e)),
+        };
+
+        Ok(PagesResponse {
+            status: "success",
+            data: vec![page],
         })
     }
 }

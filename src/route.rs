@@ -15,6 +15,6 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
         .route("/", get(handler_root))
         .route("/popular", get(handler_popular))
         .route("/pages", get(handler_pages))
-        .route("/pages/:id", get(handler_page))
+        .route("/pages/:page_id", get(handler_page))
         .with_state(app_state)
 }
