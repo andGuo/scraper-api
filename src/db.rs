@@ -1,7 +1,10 @@
 use crate::{error::MyError, model::Page, response::PagesResponse};
 use futures::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, Document};
-use mongodb::{options::ClientOptions, Client, Collection};
+use mongodb::{
+    options::{ClientOptions, FindOptions},
+    Client, Collection,
+};
 
 #[derive(Clone, Debug)]
 pub struct DB {
@@ -68,6 +71,30 @@ impl DB {
         Ok(PagesResponse {
             status: "success",
             data: vec![page],
+        })
+    }
+
+    pub async fn get_popular(&self) -> Result<PagesResponse> {
+        let find_options = FindOptions::builder()
+            .sort(doc! { "page_rank": -1 })
+            .limit(10)
+            .build();
+
+        let mut cursor = self
+            .page_collection
+            .find(None, find_options)
+            .await
+            .map_err(MyError::MongoQueryError)?;
+
+        let mut json_res: Vec<Page> = Vec::new();
+
+        while let Some(pg) = cursor.try_next().await? {
+            json_res.push(pg);
+        }
+
+        Ok(PagesResponse {
+            status: "success",
+            data: json_res,
         })
     }
 }

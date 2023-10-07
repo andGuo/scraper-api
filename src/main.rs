@@ -30,7 +30,7 @@ async fn main() -> Result<(), MyError> {
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var(
             "RUST_LOG",
-            "tower_http=debug,mongodb::command=debug",
+            "tower_http=debug",//",mongodb::command=debug",
         )
     }
 
