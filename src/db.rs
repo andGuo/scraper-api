@@ -1,4 +1,8 @@
-use crate::{error::MyError, model::Page, response::PagesResponse};
+use crate::{
+    error::MyError,
+    model::Page,
+    response::{PageResponse, PagesResponse},
+};
 use futures::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, Document};
 use mongodb::{
@@ -45,10 +49,10 @@ impl DB {
             .await
             .map_err(MyError::MongoQueryError)?;
 
-        let mut json_res: Vec<Page> = Vec::new();
+        let mut json_res: Vec<PageResponse> = Vec::new();
 
         while let Some(pg) = cursor.try_next().await? {
-            json_res.push(pg);
+            json_res.push(pg.into());
         }
 
         Ok(PagesResponse {
@@ -70,7 +74,7 @@ impl DB {
 
         Ok(PagesResponse {
             status: "success",
-            data: vec![page],
+            data: vec![page.into()],
         })
     }
 
@@ -86,10 +90,10 @@ impl DB {
             .await
             .map_err(MyError::MongoQueryError)?;
 
-        let mut json_res: Vec<Page> = Vec::new();
+        let mut json_res: Vec<PageResponse> = Vec::new();
 
         while let Some(pg) = cursor.try_next().await? {
-            json_res.push(pg);
+            json_res.push(pg.into());
         }
 
         Ok(PagesResponse {

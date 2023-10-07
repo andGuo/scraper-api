@@ -1,20 +1,21 @@
+use chrono::{DateTime, Utc};
 use mongodb::bson::{self, oid::ObjectId};
 use serde::{Deserialize, Serialize};
+use bson::serde_helpers::chrono_datetime_as_bson_datetime; 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Page {
     #[serde(rename = "_id")]
     pub id: ObjectId,
     pub url: String,
-    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<bson::DateTime>,
-    #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<bson::DateTime>,
+    #[serde(rename = "createdAt", with = "chrono_datetime_as_bson_datetime")]
+    pub created_at: DateTime<Utc>,
+    #[serde(rename = "updatedAt", with = "chrono_datetime_as_bson_datetime")]
+    pub updated_at: DateTime<Utc>,
     pub title: String,
     pub keywords: Vec<String>,
     pub text_content: String,
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
-    #[serde(rename = "pageRank", skip_serializing_if = "Option::is_none")]
-    pub page_rank: Option<f64>,
+    pub page_rank: f64,
 }
