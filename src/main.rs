@@ -28,6 +28,13 @@ pub struct AppState {
 async fn main() -> Result<(), MyError> {
     dotenv().ok();
 
+    if std::env::var_os("RUST_LOG").is_none() {
+        std::env::set_var(
+            "RUST_LOG",
+            "tower_http=debug,mongodb::command=debug",
+        )
+    }
+
     let db = DB::init().await?;
 
     let cors = CorsLayer::new()
@@ -37,7 +44,7 @@ async fn main() -> Result<(), MyError> {
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
 
     tracing_subscriber::fmt::init();
-    let app = create_router(Arc::new(AppState { db })).layer(cors);
+    let app = create_router(Arc::new(AppState { db })).layer(cors).layer(TraceLayer::new_for_http());;
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::info!("listening on {}", addr);

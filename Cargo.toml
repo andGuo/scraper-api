@@ -13,7 +13,7 @@ serde_json = "1.0.96"
 dotenv = "0.15.0"
 chrono = { version = "0.4.24", features = ["serde"] }
 futures = { version = "0.3.28", default-features = false, features = ["async-await"] }
-mongodb = { version = "2.7.0", features = ["bson-chrono-0_4"] }
+mongodb = { version = "2.7.0", features = ["bson-chrono-0_4", "tracing-unstable"] }
 thiserror = "1.0.40"
 tower-http = { version = "0.4.4", features = ["cors", "trace"] }
 tracing = "0.1.37"
