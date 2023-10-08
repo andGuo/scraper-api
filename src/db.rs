@@ -5,7 +5,7 @@ use crate::{
     schema::SearchParamOptions,
 };
 use futures::TryStreamExt;
-use mongodb::bson::{doc, oid::ObjectId, Document};
+use mongodb::bson::{doc, from_document, oid::ObjectId, Document};
 use mongodb::{
     options::{ClientOptions, FindOptions},
     Client, Collection,
@@ -44,25 +44,62 @@ impl DB {
     }
 
     pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<FruitsResponse> {
-        let mut cursor = self
-            .fruit_collection
-            .find(None, None)
-            .await
-            .map_err(MyError::MongoQueryError)?;
+        if params.q.is_some() {
+            let pipeline = vec![
+                doc! {
+                    "$search": {
+                        "index": "default",
+                        "text": {
+                            "query": params.q.unwrap(),
+                            "path": ["text_content", "keywords", "title"],
+                            "fuzzy": {}
+                        },
+                        "scoreDetails": true
+                    }
+                },
+                doc! {
+                    "$limit": params.limit.unwrap_or(10)
+                },
+            ];
 
-        let mut json_res: Vec<FruitResponse> = Vec::new();
+            let mut cursor = self
+                .fruit_collection
+                .aggregate(pipeline, None)
+                .await
+                .map_err(MyError::MongoQueryError)?;
 
-        while let Some(pg) = cursor.try_next().await? {
-            match json_res.len() < params.limit.unwrap_or(std::i32::MAX) as usize {
-                true => json_res.push(pg.into()),
-                _ => break,
+            let mut json_res: Vec<FruitResponse> = Vec::new();
+
+            while let Some(doc) = cursor.try_next().await? {
+                let fruit: Fruit = from_document(doc).unwrap();
+                json_res.push(fruit.into());
             }
-        }
 
-        Ok(FruitsResponse {
-            status: "success",
-            data: json_res,
-        })
+            Ok(FruitsResponse {
+                status: "success",
+                data: json_res,
+            })
+        } else {
+            let mut cursor = self
+                .fruit_collection
+                .find(None, None)
+                .await
+                .map_err(MyError::MongoQueryError)?;
+
+            let mut json_res: Vec<FruitResponse> = Vec::new();
+
+            while let Some(pg) = cursor.try_next().await? {
+                match json_res.len() < params.limit.unwrap_or(std::i32::MAX) as usize {
+                    true => json_res.push(pg.into()),
+                    _ => break,
+                }
+            }
+
+            Ok(FruitsResponse {
+                status: "success",
+                data: json_res,
+            })
+        }
     }
 
     pub async fn get_fruit(&self, fruit_id: ObjectId) -> Result<FruitsResponse> {
