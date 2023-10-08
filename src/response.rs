@@ -1,4 +1,4 @@
-use crate::model::Page;
+use crate::model::Fruit;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -8,7 +8,7 @@ pub struct GenericResponse {
 }
 
 #[derive(Serialize, Debug)]
-pub struct PageResponse {
+pub struct FruitResponse {
     pub id: String,
     pub url: String,
     pub created_at: String,
@@ -21,25 +21,25 @@ pub struct PageResponse {
     pub page_rank: f64,
 }
 
-impl From<Page> for PageResponse {
-    fn from(page: Page) -> Self {
-        PageResponse {
-            id: page.id.to_hex(),
-            url: page.url,
-            created_at: page.created_at.to_rfc3339(),
-            updated_at: page.updated_at.to_rfc3339(),
-            title: page.title,
-            keywords: page.keywords,
-            text_content: page.text_content,
-            out_links: page.out_links,
-            in_links: page.in_links,
-            page_rank: page.page_rank,
+impl From<Fruit> for FruitResponse {
+    fn from(fruit: Fruit) -> Self {
+        FruitResponse {
+            id: fruit.id.to_hex(),
+            url: fruit.url,
+            created_at: fruit.created_at.to_rfc3339(),
+            updated_at: fruit.updated_at.to_rfc3339(),
+            title: fruit.title,
+            keywords: fruit.keywords,
+            text_content: fruit.text_content,
+            out_links: fruit.out_links,
+            in_links: fruit.in_links,
+            page_rank: fruit.page_rank,
         }
     }
 }
 
 #[derive(Serialize, Debug)]
-pub struct PagesResponse {
+pub struct FruitsResponse {
     pub status: &'static str,
-    pub data: Vec<PageResponse>,
+    pub data: Vec<FruitResponse>,
 }

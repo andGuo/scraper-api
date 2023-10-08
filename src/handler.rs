@@ -24,21 +24,21 @@ pub async fn handler_popular(
     }
 }
 
-pub async fn handler_pages(
+pub async fn handler_fruits(
     State(app_state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    match app_state.db.get_pages().await.map_err(MyError::from) {
+    match app_state.db.get_fruits().await.map_err(MyError::from) {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e.into()),
     }
 }
 
-pub async fn handler_page(
-    Path(page_id): Path<String>,
+pub async fn handler_fruit(
+    Path(fruit_id): Path<String>,
     State(app_state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    match ObjectId::parse_str(page_id) {
-        Ok(id) => match app_state.db.get_page(id).await.map_err(MyError::from) {
+    match ObjectId::parse_str(fruit_id) {
+        Ok(id) => match app_state.db.get_fruit(id).await.map_err(MyError::from) {
             Ok(res) => Ok(Json(res)),
             Err(e) => Err(e.into()),
         },

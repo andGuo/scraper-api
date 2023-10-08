@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 use bson::serde_helpers::chrono_datetime_as_bson_datetime; 
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Page {
+pub struct Fruit {
     #[serde(rename = "_id")]
     pub id: ObjectId,
     pub url: String,
-    #[serde(rename = "createdAt", with = "chrono_datetime_as_bson_datetime")]
+    #[serde(with = "chrono_datetime_as_bson_datetime")]
     pub created_at: DateTime<Utc>,
-    #[serde(rename = "updatedAt", with = "chrono_datetime_as_bson_datetime")]
+    #[serde(with = "chrono_datetime_as_bson_datetime")]
     pub updated_at: DateTime<Utc>,
     pub title: String,
     pub keywords: Vec<String>,
