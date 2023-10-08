@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::{IntoResponse, Redirect},
     Json,
@@ -9,9 +9,9 @@ use axum::{
 use mongodb::bson::oid::ObjectId;
 use serde_json::json;
 
-use crate::{error::MyError, AppState};
+use crate::{error::MyError, schema::SearchParamOptions, AppState};
 
-pub async fn handler_root() -> Redirect{
+pub async fn handler_root() -> Redirect {
     Redirect::permanent(&std::env::var("FRONTEND_URL").expect("FRONTEND_URL must be set."))
 }
 
@@ -25,9 +25,15 @@ pub async fn handler_popular(
 }
 
 pub async fn handler_fruits(
+    params: Option<Query<SearchParamOptions>>,
     State(app_state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    match app_state.db.get_fruits().await.map_err(MyError::from) {
+    let Query(mut params) = params.unwrap_or_default();
+    params.validate();
+
+    println!("opts: {:?}", params);
+
+    match app_state.db.get_fruits(params).await.map_err(MyError::from) {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e.into()),
     }

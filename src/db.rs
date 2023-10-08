@@ -2,6 +2,7 @@ use crate::{
     error::MyError,
     model::Fruit,
     response::{FruitResponse, FruitsResponse},
+    schema::SearchParamOptions,
 };
 use futures::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, Document};
@@ -42,7 +43,7 @@ impl DB {
         })
     }
 
-    pub async fn get_fruits(&self) -> Result<FruitsResponse> {
+    pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<FruitsResponse> {
         let mut cursor = self
             .fruit_collection
             .find(None, None)
@@ -52,7 +53,10 @@ impl DB {
         let mut json_res: Vec<FruitResponse> = Vec::new();
 
         while let Some(pg) = cursor.try_next().await? {
-            json_res.push(pg.into());
+            match json_res.len() < params.limit.unwrap_or(std::i32::MAX) as usize {
+                true => json_res.push(pg.into()),
+                _ => break,
+            }
         }
 
         Ok(FruitsResponse {
