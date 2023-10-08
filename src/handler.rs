@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    response::IntoResponse,
+    response::{IntoResponse, Redirect},
     Json,
 };
 use mongodb::bson::oid::ObjectId;
@@ -11,8 +11,8 @@ use serde_json::json;
 
 use crate::{error::MyError, AppState};
 
-pub async fn handler_root() -> &'static str {
-    "Hello, World!"
+pub async fn handler_root() -> Redirect{
+    Redirect::permanent(&std::env::var("FRONTEND_URL").expect("FRONTEND_URL must be set."))
 }
 
 pub async fn handler_popular(
