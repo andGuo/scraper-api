@@ -1,0 +1,18 @@
+{
+  "analyzer": "lucene.standard",
+  "searchAnalyzer": "lucene.standard",
+  "mappings": {
+    "dynamic": true,
+    "fields": {
+      "keywords": {
+        "type": "autocomplete"
+      }
+    }
+  },
+  "storedSource": {
+    "exclude": [
+      "created_at",
+      "updated_at"
+    ]
+  }
+}

@@ -52,13 +52,18 @@ impl DB {
                         "text": {
                             "query": params.q.unwrap(),
                             "path": ["text_content", "keywords", "title"],
-                            "fuzzy": {}
+                            "fuzzy": {}, // use default fuzzy options
                         },
-                        "scoreDetails": true
-                    }
+                        "scoreDetails": true,
+                    },
                 },
                 doc! {
-                    "$limit": params.limit.unwrap_or(10)
+                    "$limit": params.limit.unwrap_or(10),
+                },
+                doc! {
+                    "$addFields": {
+                        "score": { "$meta": "searchScoreDetails" },
+                    },
                 },
             ];
 

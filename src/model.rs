@@ -18,4 +18,12 @@ pub struct Fruit {
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
     pub page_rank: f64,
+    pub score: Option<ScoreDetails>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ScoreDetails {
+    pub value: f32,
+    pub description: String,
+    pub details: Vec<ScoreDetails>,
 }
