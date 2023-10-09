@@ -1,4 +1,4 @@
-use crate::model::Fruit;
+use crate::model::{Fruit, ScoreDetails};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -19,6 +19,7 @@ pub struct FruitResponse {
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
     pub page_rank: f64,
+    pub score: Option<ScoreDetails>,
 }
 
 impl From<Fruit> for FruitResponse {
@@ -34,6 +35,7 @@ impl From<Fruit> for FruitResponse {
             out_links: fruit.out_links,
             in_links: fruit.in_links,
             page_rank: fruit.page_rank,
+            score: fruit.score,
         }
     }
 }

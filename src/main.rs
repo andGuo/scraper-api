@@ -4,6 +4,7 @@ mod handler;
 mod model;
 mod response;
 mod route;
+mod schema;
 
 use std::sync::Arc;
 
@@ -19,6 +20,7 @@ use std::net::SocketAddr;
 use tower_http::{
     cors::{Any, CorsLayer},
     trace::TraceLayer,
+    catch_panic::CatchPanicLayer,
 };
 
 #[derive(Clone)]
@@ -47,7 +49,8 @@ async fn main() -> Result<(), MyError> {
     tracing_subscriber::fmt::init();
     let app = create_router(Arc::new(AppState { db }))
         .layer(cors)
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(CatchPanicLayer::new());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::info!("listening on {}", addr);
