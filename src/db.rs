@@ -1,7 +1,7 @@
 use crate::{
     error::MyError,
     model::Fruit,
-    response::{FruitResponse, FruitsResponse},
+    response::FruitResponse,
     schema::SearchParamOptions,
 };
 use futures::TryStreamExt;
@@ -43,7 +43,7 @@ impl DB {
         })
     }
 
-    pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<FruitsResponse> {
+    pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<Vec<FruitResponse>> {
         if params.q.is_some() {
             let is_boost = params.boost.unwrap_or(false);
             let pipeline = vec![
@@ -102,10 +102,7 @@ impl DB {
                 });
             }
 
-            Ok(FruitsResponse {
-                status: "success",
-                data: json_res,
-            })
+            Ok(json_res)
         } else {
             let mut cursor = self
                 .fruit_collection
@@ -122,14 +119,11 @@ impl DB {
                 }
             }
 
-            Ok(FruitsResponse {
-                status: "success",
-                data: json_res,
-            })
+            Ok(json_res)
         }
     }
 
-    pub async fn get_fruit(&self, fruit_id: ObjectId) -> Result<FruitsResponse> {
+    pub async fn get_fruit(&self, fruit_id: ObjectId) -> Result<Vec<FruitResponse>> {
         let fruit = match self
             .fruit_collection
             .find_one(doc! {"_id": fruit_id}, None)
@@ -140,13 +134,10 @@ impl DB {
             Err(e) => return Err(MyError::MongoError(e)),
         };
 
-        Ok(FruitsResponse {
-            status: "success",
-            data: vec![fruit.into()],
-        })
+        Ok(vec![fruit.into()])
     }
 
-    pub async fn get_popular(&self) -> Result<FruitsResponse> {
+    pub async fn get_popular(&self) -> Result<Vec<FruitResponse>> {
         let find_options = FindOptions::builder()
             .sort(doc! { "page_rank": -1 })
             .limit(10)
@@ -164,9 +155,6 @@ impl DB {
             json_res.push(pg.into());
         }
 
-        Ok(FruitsResponse {
-            status: "success",
-            data: json_res,
-        })
+        Ok(json_res)
     }
 }
