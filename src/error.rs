@@ -19,6 +19,8 @@ pub enum MyError {
     InvalidIDError(String),
     #[error("Fruit with ID: {0} not found")]
     NotFoundError(String),
+    #[error("Unfruitful search query...")]
+    SearchNotFoundError(),
 }
 
 #[derive(Serialize)]
@@ -56,6 +58,13 @@ impl Into<(axum::http::StatusCode, Json<serde_json::Value>)> for MyError {
                 ErrorResponse {
                     status: "fail",
                     message: format!("Fruit with ID: {} not found", id),
+                },
+            ),
+            MyError::SearchNotFoundError() => (
+                StatusCode::NOT_FOUND,
+                ErrorResponse {
+                    status: "fail",
+                    message: "Unfruitful search query...".to_string(),
                 },
             ),
             MyError::MongoError(e) => (
