@@ -18,8 +18,9 @@ pub struct FruitResponse {
     pub text_content: String,
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
-    pub page_rank: f64,
+    pub pr: f64,
     pub score: Option<ScoreDetails>,
+    pub name: &'static str,
 }
 
 impl From<Fruit> for FruitResponse {
@@ -34,8 +35,9 @@ impl From<Fruit> for FruitResponse {
             text_content: fruit.text_content,
             out_links: fruit.out_links,
             in_links: fruit.in_links,
-            page_rank: fruit.page_rank,
+            pr: fruit.page_rank,
             score: fruit.score,
+            name: "Andrew Guo",
         }
     }
 }

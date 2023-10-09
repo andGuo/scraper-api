@@ -91,12 +91,12 @@ impl DB {
                     b.score
                         .as_ref()
                         .map(|score_b| &score_b.value)
-                        .unwrap_or(&b.page_rank)
+                        .unwrap_or(&b.pr)
                         .partial_cmp(
                             &a.score
                                 .as_ref()
                                 .map(|score_a| &score_a.value)
-                                .unwrap_or(&a.page_rank),
+                                .unwrap_or(&a.pr),
                         )
                         .unwrap()
                 });
