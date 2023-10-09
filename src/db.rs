@@ -45,6 +45,7 @@ impl DB {
 
     pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<FruitsResponse> {
         if params.q.is_some() {
+            let is_boost = params.boost.unwrap_or(false);
             let pipeline = vec![
                 doc! {
                     "$search": {
@@ -78,14 +79,14 @@ impl DB {
             while let Some(doc) = cursor.try_next().await? {
                 let mut fruit: Fruit = from_document(doc).unwrap();
 
-                if params.boost.unwrap_or(false) {
+                if is_boost {
                     fruit.boost_score();
                 }
 
                 json_res.push(fruit.into());
             }
 
-            if params.boost.unwrap_or(false) {
+            if is_boost {
                 json_res.sort_by(|a, b| {
                     b.score
                         .as_ref()
@@ -114,9 +115,9 @@ impl DB {
 
             let mut json_res: Vec<FruitResponse> = Vec::new();
 
-            while let Some(pg) = cursor.try_next().await? {
+            while let Some(fruit) = cursor.try_next().await? {
                 match json_res.len() < params.limit.unwrap_or(std::i32::MAX) as usize {
-                    true => json_res.push(pg.into()),
+                    true => json_res.push(fruit.into()),
                     _ => break,
                 }
             }
