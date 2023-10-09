@@ -85,6 +85,22 @@ impl DB {
                 json_res.push(fruit.into());
             }
 
+            if params.boost.unwrap_or(false) {
+                json_res.sort_by(|a, b| {
+                    b.score
+                        .as_ref()
+                        .map(|score_b| &score_b.value)
+                        .unwrap_or(&b.page_rank)
+                        .partial_cmp(
+                            &a.score
+                                .as_ref()
+                                .map(|score_a| &score_a.value)
+                                .unwrap_or(&a.page_rank),
+                        )
+                        .unwrap()
+                });
+            }
+
             Ok(FruitsResponse {
                 status: "success",
                 data: json_res,
