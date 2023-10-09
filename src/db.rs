@@ -76,7 +76,12 @@ impl DB {
             let mut json_res: Vec<FruitResponse> = Vec::new();
 
             while let Some(doc) = cursor.try_next().await? {
-                let fruit: Fruit = from_document(doc).unwrap();
+                let mut fruit: Fruit = from_document(doc).unwrap();
+
+                if params.boost.unwrap_or(false) {
+                    fruit.boost_score();
+                }
+
                 json_res.push(fruit.into());
             }
 

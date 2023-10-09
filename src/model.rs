@@ -1,7 +1,7 @@
+use bson::serde_helpers::chrono_datetime_as_bson_datetime;
 use chrono::{DateTime, Utc};
 use mongodb::bson::{self, oid::ObjectId};
 use serde::{Deserialize, Serialize};
-use bson::serde_helpers::chrono_datetime_as_bson_datetime; 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fruit {
@@ -21,9 +21,27 @@ pub struct Fruit {
     pub score: Option<ScoreDetails>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ScoreDetails {
-    pub value: f32,
+    pub value: f64,
     pub description: String,
     pub details: Vec<ScoreDetails>,
+}
+
+impl Fruit {
+    pub fn boost_score(&mut self) -> &Self {
+        if let Some(score) = self.score.clone() {
+            let new_value = self.page_rank * score.value;
+            let new_description = format!("score boosted by page_rank");
+            let new_details = vec![score];
+
+            let new_score = ScoreDetails {
+                value: new_value,
+                description: new_description,
+                details: new_details,
+            };
+            self.score = Some(new_score);
+        }
+        self
+    }
 }
