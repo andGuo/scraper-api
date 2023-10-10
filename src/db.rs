@@ -137,7 +137,7 @@ impl DB {
         Ok(vec![fruit.into()])
     }
 
-    pub async fn get_popular(&self) -> Result<Vec<FruitResponse>> {
+    pub async fn get_popular_fruit(&self) -> Result<Vec<FruitResponse>> {
         let find_options = FindOptions::builder()
             .sort(doc! { "page_rank": -1 })
             .limit(10)
