@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub struct SearchParamOptions {
     pub q: Option<String>,
     pub boost: Option<bool>,
-    pub limit: Option<i32>,
+    pub limit: Option<i64>,
 }
 
 impl SearchParamOptions {

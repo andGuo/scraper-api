@@ -59,7 +59,7 @@ impl DB {
                     },
                 },
                 doc! {
-                    "$limit": params.limit.unwrap_or(10),
+                    "$limit": params.limit.unwrap(),
                 },
                 doc! {
                     "$addFields": {
@@ -104,19 +104,21 @@ impl DB {
 
             Ok(json_res)
         } else {
+            let find_options = FindOptions::builder()
+                .sort(doc! { "page_rank": -1 })
+                .limit(params.limit.unwrap())
+                .build();
+    
             let mut cursor = self
                 .fruit_collection
-                .find(None, None)
+                .find(None, find_options)
                 .await
                 .map_err(MyError::MongoQueryError)?;
 
             let mut json_res: Vec<FruitResponse> = Vec::new();
 
             while let Some(fruit) = cursor.try_next().await? {
-                match json_res.len() < params.limit.unwrap_or(std::i32::MAX) as usize {
-                    true => json_res.push(fruit.into()),
-                    _ => break,
-                }
+                json_res.push(fruit.into());
             }
 
             Ok(json_res)
