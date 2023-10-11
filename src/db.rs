@@ -3,6 +3,7 @@ use crate::{
     model::Fruit,
     response::FruitResponse,
     schema::SearchParamOptions,
+    pipelines::create_search_pipe
 };
 use futures::TryStreamExt;
 use mongodb::bson::{doc, from_document, oid::ObjectId, Document};
@@ -46,27 +47,8 @@ impl DB {
     pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<Vec<FruitResponse>> {
         if params.q.is_some() {
             let is_boost = params.boost.unwrap_or(false);
-            let pipeline = vec![
-                doc! {
-                    "$search": {
-                        "index": "default",
-                        "text": {
-                            "query": params.q.unwrap(),
-                            "path": ["text_content", "keywords", "title"],
-                            "fuzzy": {}, // use default fuzzy options
-                        },
-                        "scoreDetails": true,
-                    },
-                },
-                doc! {
-                    "$limit": params.limit.unwrap(),
-                },
-                doc! {
-                    "$addFields": {
-                        "score": { "$meta": "searchScoreDetails" },
-                    },
-                },
-            ];
+            
+            let pipeline = create_search_pipe(&params.q.unwrap(), is_boost, params.limit.unwrap());
 
             let mut cursor = self
                 .fruit_collection
@@ -77,29 +59,8 @@ impl DB {
             let mut json_res: Vec<FruitResponse> = Vec::new();
 
             while let Some(doc) = cursor.try_next().await? {
-                let mut fruit: Fruit = from_document(doc).unwrap();
-
-                if is_boost {
-                    fruit.boost_score();
-                }
-
+                let fruit: Fruit = from_document(doc).unwrap();
                 json_res.push(fruit.into());
-            }
-
-            if is_boost {
-                json_res.sort_by(|a, b| {
-                    b.score
-                        .as_ref()
-                        .map(|score_b| &score_b.value)
-                        .unwrap_or(&b.pr)
-                        .partial_cmp(
-                            &a.score
-                                .as_ref()
-                                .map(|score_a| &score_a.value)
-                                .unwrap_or(&a.pr),
-                        )
-                        .unwrap()
-                });
             }
 
             Ok(json_res)

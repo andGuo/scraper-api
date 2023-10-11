@@ -27,22 +27,3 @@ pub struct ScoreDetails {
     pub description: String,
     pub details: Vec<ScoreDetails>,
 }
-
-// TODO: Make this not use clone(), 
-// using a Box<> or Arc<> in struct causes an error when unwrap() in db.
-impl Fruit {
-    pub fn boost_score(&mut self) {
-        if let Some(score) = self.score.clone() {
-            let new_value = self.page_rank * score.value;
-            let new_description = format!("score boosted by page_rank");
-            let new_details = vec![score];
-
-            let new_score = ScoreDetails {
-                value: new_value,
-                description: new_description,
-                details: new_details,
-            };
-            self.score = Some(new_score);
-        }
-    }
-}

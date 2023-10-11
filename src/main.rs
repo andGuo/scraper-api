@@ -2,6 +2,7 @@ mod db;
 mod error;
 mod handler;
 mod model;
+mod pipelines;
 mod response;
 mod route;
 mod schema;
