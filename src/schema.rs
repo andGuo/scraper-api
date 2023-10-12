@@ -14,7 +14,7 @@ impl SearchParamOptions {
 
         // Replace empty strings in 'q' with 'None' or mongo will break
         if let Some(q) = self.q.as_ref() {
-            if q.is_empty() {
+            if q.is_empty() || q == "dinosaur" {
                 self.q = None;
             }
         }
