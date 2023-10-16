@@ -6,11 +6,15 @@ use axum::{
 };
 
 use crate::{
-    handler::{handler_fruit, 
-        handler_fruits, 
-        handler_popular_fruit, 
-        handler_root, 
-        handler_personal, handler_personals, handler_popular_personal},
+    handler::{
+            handler_fruit, 
+            handler_fruits, 
+            handler_popular_fruit, 
+            handler_root, 
+            handler_personal, 
+            handler_personals, 
+            handler_popular_personal,
+    },
     AppState,
 };
 
