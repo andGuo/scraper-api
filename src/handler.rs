@@ -54,3 +54,43 @@ pub async fn handler_fruit(
         )),
     }
 }
+
+pub async fn handler_popular_personal(
+    State(app_state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    match app_state.db.get_popular_personal().await.map_err(MyError::from) {
+        Ok(res) => Ok(Json(res)),
+        Err(e) => Err(e.into()),
+    }
+}
+
+pub async fn handler_personals(
+    params: Option<Query<SearchParamOptions>>,
+    State(app_state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    let Query(mut params) = params.unwrap_or_default();
+    params.validate();
+
+    println!("opts: {:?}", params);
+
+    match app_state.db.get_personals(params).await.map_err(MyError::from) {
+        Ok(res) => Ok(Json(res)),
+        Err(e) => Err(e.into()),
+    }
+}
+
+pub async fn handler_personal(
+    Path(fruit_id): Path<String>,
+    State(app_state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    match ObjectId::parse_str(fruit_id) {
+        Ok(id) => match app_state.db.get_personal(id).await.map_err(MyError::from) {
+            Ok(res) => Ok(Json(res)),
+            Err(e) => Err(e.into()),
+        },
+        Err(_) => Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error": "Invalid id"})),
+        )),
+    }
+}
