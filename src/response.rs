@@ -19,12 +19,14 @@ pub struct FruitResponse {
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
     pub pr: f64,
-    pub score: Option<ScoreDetails>,
+    pub score: f64,
+    pub score_details: Option<ScoreDetails>,
     pub name: &'static str,
 }
 
 impl From<Fruit> for FruitResponse {
     fn from(fruit: Fruit) -> Self {
+        let cloned_score = fruit.score.clone();
         FruitResponse {
             id: fruit.id.to_hex(),
             url: fruit.url,
@@ -36,7 +38,8 @@ impl From<Fruit> for FruitResponse {
             out_links: fruit.out_links,
             in_links: fruit.in_links,
             pr: fruit.page_rank,
-            score: fruit.score,
+            score_details: fruit.score,
+            score: cloned_score.unwrap_or_default().value,
             name: "Andrew Guo",
         }
     }
@@ -60,13 +63,15 @@ pub struct XkcdResponse {
     pub out_links: Vec<String>,
     pub in_links: Vec<String>,
     pub pr: f64,
-    pub score: Option<ScoreDetails>,
+    pub score: f64,
+    pub score_details: Option<ScoreDetails>,
     pub name: &'static str,
     pub img_url: String,
 }
 
 impl From<Xkcd> for XkcdResponse {
     fn from(comic: Xkcd) -> Self {
+        let cloned_score = comic.score.clone();
         XkcdResponse {
             id: comic.id.to_hex(),
             url: comic.url,
@@ -78,7 +83,8 @@ impl From<Xkcd> for XkcdResponse {
             out_links: comic.out_links,
             in_links: comic.in_links,
             pr: comic.page_rank,
-            score: comic.score,
+            score_details: comic.score,
+            score: cloned_score.unwrap_or_default().value,
             name: "Andrew Guo",
             img_url: comic.img_url,
         }

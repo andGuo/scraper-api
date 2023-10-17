@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use mongodb::bson::{self, oid::ObjectId};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct ScoreDetails {
     pub value: f64,
     pub description: String,
