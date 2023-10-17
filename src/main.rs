@@ -1,6 +1,7 @@
 mod db;
 mod error;
 mod handler;
+mod middleware;
 mod model;
 mod pipelines;
 mod response;
@@ -12,14 +13,18 @@ use std::{
     sync::Arc,
 };
 
-use axum::http::{
-    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-    Method,
+use axum::{
+    http::{
+        header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+        Method
+    }, 
+    middleware::from_fn,
 };
 use db::DB;
 use dotenv::dotenv;
 use error::MyError;
 use route::create_router;
+use middleware::redirect_middleware;
 use std::net::SocketAddr;
 use tower_http::{
     catch_panic::CatchPanicLayer,
@@ -68,6 +73,7 @@ async fn main() -> Result<(), MyError> {
 
     tracing_subscriber::fmt::init();
     let app = create_router(Arc::new(AppState { db }))
+        .layer(from_fn(redirect_middleware))
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .layer(CatchPanicLayer::new());
