@@ -18,7 +18,12 @@ pub async fn handler_root() -> Redirect {
 pub async fn handler_popular_fruit(
     State(app_state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    match app_state.db.get_popular_fruit().await.map_err(MyError::from) {
+    match app_state
+        .db
+        .get_popular_fruit()
+        .await
+        .map_err(MyError::from)
+    {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e.into()),
     }
@@ -58,7 +63,12 @@ pub async fn handler_fruit(
 pub async fn handler_popular_personal(
     State(app_state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    match app_state.db.get_popular_personal().await.map_err(MyError::from) {
+    match app_state
+        .db
+        .get_popular_personal()
+        .await
+        .map_err(MyError::from)
+    {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e.into()),
     }
@@ -73,7 +83,12 @@ pub async fn handler_personals(
 
     println!("opts: {:?}", params);
 
-    match app_state.db.get_personals(params).await.map_err(MyError::from) {
+    match app_state
+        .db
+        .get_personals(params)
+        .await
+        .map_err(MyError::from)
+    {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e.into()),
     }

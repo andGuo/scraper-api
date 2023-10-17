@@ -2,62 +2,61 @@ use mongodb::bson::{doc, Document};
 
 pub fn create_search_pipe(q: &String, boost: bool, limit: i64) -> Vec<Document> {
     let search_pipeline = vec![
-                    doc! {
-                        "$search": {
-                            "index": "default",
-                            "text": {
-                                "query": q,
-                                "path": ["text_content", "title", "url"],
-                                "fuzzy": {}, // use default fuzzy options
-                            },
-                            "scoreDetails": true,
-                        },
-                    },
-                    doc! {
-                        "$limit": limit,
-                    },
-                    doc! {
-                        "$addFields": {
-                            "score": { "$meta": "searchScoreDetails" },
-                        },
-                    },
-                ];
-
+        doc! {
+            "$search": {
+                "index": "default",
+                "text": {
+                    "query": q,
+                    "path": ["text_content", "title", "url"],
+                    "fuzzy": {}, // use default fuzzy options
+                },
+                "scoreDetails": true,
+            },
+        },
+        doc! {
+            "$limit": limit,
+        },
+        doc! {
+            "$addFields": {
+                "score": { "$meta": "searchScoreDetails" },
+            },
+        },
+    ];
 
     let boost_pipeline = vec![
-                    doc! {
-                        "$search": {
-                            "index": "default",
-                            "text": {
-                                "query": q,
-                                "path": ["text_content", "title", "url"],
-                                "fuzzy": {}, // use default fuzzy options
-                                "score": { 
-                                    "function": {
-                                        "multiply":[
-                                            {
-                                                "add":[
-                                                    { "path": "page_rank" },
-                                                    { "constant": 1 },
-                                                ]
-                                            },
-                                            { "score": "relevance" },
-                                        ],
-                                    },
+        doc! {
+            "$search": {
+                "index": "default",
+                "text": {
+                    "query": q,
+                    "path": ["text_content", "title", "url"],
+                    "fuzzy": {}, // use default fuzzy options
+                    "score": {
+                        "function": {
+                            "multiply":[
+                                {
+                                    "add":[
+                                        { "path": "page_rank" },
+                                        { "constant": 1 },
+                                    ]
                                 },
-                            },
-                            "scoreDetails": true,
+                                { "score": "relevance" },
+                            ],
                         },
                     },
-                    doc! {
-                        "$limit": limit,
-                    },
-                    doc! {
-                        "$addFields": {
-                            "score": { "$meta": "searchScoreDetails" },
-                        },
-                    },
-                ];
+                },
+                "scoreDetails": true,
+            },
+        },
+        doc! {
+            "$limit": limit,
+        },
+        doc! {
+            "$addFields": {
+                "score": { "$meta": "searchScoreDetails" },
+            },
+        },
+    ];
 
     // let boost_pipeline = vec![
     //     doc! {
@@ -67,7 +66,7 @@ pub fn create_search_pipe(q: &String, boost: bool, limit: i64) -> Vec<Document> 
     //                 "query": q,
     //                 "path": ["text_content", "title", "url"],
     //                 "fuzzy": {}, // use default fuzzy options
-    //                 "score": { 
+    //                 "score": {
     //                     "boost": {
     //                         "path": "page_rank",
     //                     },
@@ -86,5 +85,9 @@ pub fn create_search_pipe(q: &String, boost: bool, limit: i64) -> Vec<Document> 
     //     },
     // ];
 
-    if boost { boost_pipeline } else { search_pipeline }
+    if boost {
+        boost_pipeline
+    } else {
+        search_pipeline
+    }
 }

@@ -1,9 +1,9 @@
 use crate::{
     error::MyError,
-    model::{Fruit,Xkcd},
+    model::{Fruit, Xkcd},
+    pipelines::create_search_pipe,
     response::{FruitResponse, XkcdResponse},
     schema::SearchParamOptions,
-    pipelines::create_search_pipe
 };
 use futures::TryStreamExt;
 use mongodb::bson::{doc, from_document, oid::ObjectId, Document};
@@ -52,7 +52,7 @@ impl DB {
     pub async fn get_fruits(&self, params: SearchParamOptions) -> Result<Vec<FruitResponse>> {
         if params.q.is_some() {
             let is_boost = params.boost.unwrap_or(false);
-            
+
             let pipeline = create_search_pipe(&params.q.unwrap(), is_boost, params.limit.unwrap());
 
             let mut cursor = self
@@ -74,7 +74,7 @@ impl DB {
                 .sort(doc! { "page_rank": -1 })
                 .limit(params.limit.unwrap())
                 .build();
-    
+
             let mut cursor = self
                 .fruit_collection
                 .find(None, find_options)
@@ -127,11 +127,7 @@ impl DB {
     }
 
     pub async fn get_personal(&self, pid: ObjectId) -> Result<Vec<XkcdResponse>> {
-        let comic = match self
-            .xkcd_collection
-            .find_one(doc! {"_id": pid}, None)
-            .await
-        {
+        let comic = match self.xkcd_collection.find_one(doc! {"_id": pid}, None).await {
             Ok(Some(comic)) => comic,
             Ok(None) => return Err(MyError::NotFoundError(pid.to_string())),
             Err(e) => return Err(MyError::MongoError(e)),
@@ -139,11 +135,11 @@ impl DB {
 
         Ok(vec![comic.into()])
     }
-    
+
     pub async fn get_personals(&self, params: SearchParamOptions) -> Result<Vec<XkcdResponse>> {
         if params.q.is_some() {
             let is_boost = params.boost.unwrap_or(false);
-            
+
             let pipeline = create_search_pipe(&params.q.unwrap(), is_boost, params.limit.unwrap());
 
             let mut cursor = self
@@ -165,7 +161,7 @@ impl DB {
                 .sort(doc! { "page_rank": -1 })
                 .limit(params.limit.unwrap())
                 .build();
-    
+
             let mut cursor = self
                 .xkcd_collection
                 .find(None, find_options)
@@ -181,7 +177,7 @@ impl DB {
             Ok(json_res)
         }
     }
-    
+
     pub async fn get_popular_personal(&self) -> Result<Vec<XkcdResponse>> {
         let find_options = FindOptions::builder()
             .sort(doc! { "page_rank": -1 })
@@ -202,5 +198,4 @@ impl DB {
 
         Ok(json_res)
     }
-
 }

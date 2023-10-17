@@ -1,4 +1,4 @@
-use crate::model::{Fruit, Xkcd, ScoreDetails};
+use crate::model::{Fruit, ScoreDetails, Xkcd};
 use serde::Serialize;
 
 #[derive(Serialize)]

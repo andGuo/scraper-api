@@ -16,15 +16,15 @@ use std::{
 use axum::{
     http::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-        Method
-    }, 
+        Method,
+    },
     middleware::from_fn,
 };
 use db::DB;
 use dotenv::dotenv;
 use error::MyError;
-use route::create_router;
 use middleware::redirect_middleware;
+use route::create_router;
 use std::net::SocketAddr;
 use tower_http::{
     catch_panic::CatchPanicLayer,

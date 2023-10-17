@@ -1,19 +1,11 @@
 use std::sync::Arc;
 
-use axum::{
-    routing::get,
-    Router,
-};
+use axum::{routing::get, Router};
 
 use crate::{
     handler::{
-            handler_fruit, 
-            handler_fruits, 
-            handler_popular_fruit, 
-            handler_root, 
-            handler_personal, 
-            handler_personals, 
-            handler_popular_personal,
+        handler_fruit, handler_fruits, handler_personal, handler_personals, handler_popular_fruit,
+        handler_popular_personal, handler_root,
     },
     AppState,
 };
