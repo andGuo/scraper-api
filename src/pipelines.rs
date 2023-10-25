@@ -91,3 +91,19 @@ pub fn create_search_pipe(q: &String, boost: bool, limit: i64) -> Vec<Document> 
         search_pipeline
     }
 }
+
+pub fn create_random_pipe(limit: i64) -> Vec<Document> { 
+    let random_pipeline = vec![
+        doc! {
+            "$sample": {
+                "size": limit,
+            },
+        },
+        doc! {
+            "$addFields": {
+                "score": { "$meta": "searchScoreDetails" },
+            },
+        },
+    ];
+    random_pipeline  
+}

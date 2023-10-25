@@ -1,7 +1,7 @@
 use crate::{
     error::MyError,
     model::{Fruit, Xkcd},
-    pipelines::create_search_pipe,
+    pipelines::{create_search_pipe, create_random_pipe},
     response::{FruitResponse, XkcdResponse},
     schema::SearchParamOptions,
 };
@@ -66,6 +66,22 @@ impl DB {
             while let Some(doc) = cursor.try_next().await? {
                 let fruit: Fruit = from_document(doc).unwrap();
                 json_res.push(fruit.into());
+            }
+
+            // If no results, return random results
+            if json_res.is_empty() {
+                let pipeline = create_random_pipe(params.limit.unwrap());
+
+                let mut cursor = self
+                    .fruit_collection
+                    .aggregate(pipeline, None)
+                    .await
+                    .map_err(MyError::MongoQueryError)?;
+
+                while let Some(doc) = cursor.try_next().await? {
+                    let fruit: Fruit = from_document(doc).unwrap();
+                    json_res.push(fruit.into());
+                }
             }
 
             Ok(json_res)
@@ -153,6 +169,22 @@ impl DB {
             while let Some(doc) = cursor.try_next().await? {
                 let comic: Xkcd = from_document(doc).unwrap();
                 json_res.push(comic.into());
+            }
+
+            // If no results, return random results
+            if json_res.is_empty() {
+                let pipeline = create_random_pipe(params.limit.unwrap());
+
+                let mut cursor = self
+                    .xkcd_collection
+                    .aggregate(pipeline, None)
+                    .await
+                    .map_err(MyError::MongoQueryError)?;
+
+                while let Some(doc) = cursor.try_next().await? {
+                    let comic: Xkcd = from_document(doc).unwrap();
+                    json_res.push(comic.into());
+                }
             }
 
             Ok(json_res)
